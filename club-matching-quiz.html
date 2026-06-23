@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ชมรมไหนเหมาะกับคุณ? | เปิดโลกกิจกรรม</title>
+<meta name="description" content="ตอบคำถามสนุก ๆ แค่ไม่กี่ข้อ แล้วมาดูกันว่าชมรมไหนใช่ที่สุดสำหรับคุณ — แล้วเจอกันที่บูธในงานเปิดโลกกิจกรรม!">
+<meta name="theme-color" content="#f6f4fa">
+<!-- Social preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="ชมรมไหนเหมาะกับคุณ?">
+<meta property="og:description" content="ตอบคำถามสั้น ๆ แล้วหาชมรมที่ตรงจริตที่สุด ✨">
+<!-- แก้ตรงนี้: ใส่ลิงก์รูป preview จริงเมื่อนำขึ้นเว็บ -->
+<!-- <meta property="og:image" content="https://your-domain/preview.png"> -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎉</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<style>
+  :root{
+    /* Committed palette: tangerine hero + grape secondary (keeps a wink of the
+       original purple), plum ink, clean cool-neutral bg. Flat, no gradient overload. */
+    --brand:#ec5a13; --brand-deep:#c2440a; --brand-soft:#fdeee4;
+    --grape:#6d28d9; --grape-deep:#5b21b6; --grape-soft:#f1ebfd;
+    --ink:#2a1633; --muted:#6f5d7d;
+    --bg:#f6f4fa; --card:#ffffff; --line:#ece6f2;
+    --shadow:0 14px 38px -20px rgba(42,22,51,.20);
+    --shadow-sm:0 7px 18px -12px rgba(42,22,51,.18);
+    /* z-index scale */
+    --z-card:1; --z-toast:60;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Prompt',sans-serif; color:var(--ink);
+    min-height:100vh; min-height:100dvh;
+    background:
+      radial-gradient(680px 360px at 4% -12%, var(--brand-soft) 0%, transparent 48%),
+      radial-gradient(580px 340px at 114% 0%, var(--grape-soft) 0%, transparent 46%),
+      var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    padding-top:max(24px, env(safe-area-inset-top));
+    padding-bottom:max(24px, env(safe-area-inset-bottom));
+  }
+  .wrap{width:100%; max-width:680px}
+  .card{
+    position:relative; z-index:var(--z-card);
+    background:var(--card); border-radius:26px; padding:clamp(26px,5vw,40px) clamp(22px,4.5vw,36px);
+    box-shadow:var(--shadow); border:1px solid var(--line);
+  }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--grape-soft); color:var(--grape-deep); font-weight:600; font-size:13px;
+    padding:7px 16px; border-radius:999px; letter-spacing:.2px;
+  }
+  h1{
+    font-size:clamp(28px,7vw,38px); font-weight:700; line-height:1.18;
+    margin:18px 0 10px; color:var(--ink); text-wrap:balance;
+  }
+  h1 .hl{color:var(--brand)}
+  .sub{color:var(--muted); font-size:16px; line-height:1.7; margin-bottom:26px; text-wrap:pretty}
+  .mali{font-family:'Mali',cursive}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--brand); color:#fff; border:none; cursor:pointer;
+    font-family:'Prompt'; font-weight:600; font-size:17px;
+    padding:15px 28px; border-radius:15px; width:100%;
+    transition:transform .18s var(--ease), background-color .18s var(--ease), box-shadow .18s var(--ease);
+    box-shadow:var(--shadow-sm);
+  }
+  .btn:hover{transform:translateY(-2px); background:var(--brand-deep)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{background:var(--grape-soft); color:var(--grape-deep); box-shadow:none}
+  .btn.ghost:hover{background:#e7dcfb}
+  .btn.solid-grape{background:var(--grape)} .btn.solid-grape:hover{background:var(--grape-deep)}
+  .btn:focus-visible,.opt:focus-visible,.sharebtn:focus-visible,.maplink:focus-visible{
+    outline:3px solid var(--grape); outline-offset:3px;
+  }
+
+  .meta{display:flex; gap:18px; margin-top:22px; flex-wrap:wrap}
+  .meta div{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:14px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--brand)}
+
+  /* progress */
+  .progresshead{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px}
+  .qcount{font-weight:600; color:var(--brand-deep); font-size:14px}
+  .bar{height:10px; background:var(--grape-soft); border-radius:999px; overflow:hidden; margin-bottom:30px}
+  .fill{height:100%; width:100%; background:var(--brand); border-radius:999px;
+    transform:scaleX(0); transform-origin:left center;
+    transition:transform .45s var(--ease)}
+
+  .qtext{font-size:clamp(20px,4.6vw,24px); font-weight:700; line-height:1.4; margin-bottom:22px; text-wrap:balance}
+  .opts{display:flex; flex-direction:column; gap:12px}
+  .opt{
+    text-align:left; background:var(--card); border:2px solid var(--line);
+    border-radius:15px; padding:15px 16px; cursor:pointer;
+    font-family:'Prompt'; font-size:16px; color:var(--ink);
+    display:flex; align-items:center; gap:13px;
+    transition:border-color .15s var(--ease), background-color .15s var(--ease), transform .15s var(--ease);
+  }
+  .opt:hover{border-color:var(--brand); background:var(--brand-soft); transform:translateX(3px)}
+  .opt .ico{font-size:22px; flex-shrink:0; line-height:1}
+  .opt .t{flex:1; min-width:0; overflow-wrap:break-word; word-break:break-word}
+  .opt .kbd{
+    flex-shrink:0; font-size:12px; font-weight:600; color:var(--muted);
+    border:1.5px solid var(--line); border-radius:7px; min-width:22px; height:22px;
+    display:inline-flex; align-items:center; justify-content:center; padding:0 5px;
+  }
+  .opt.sel{border-color:var(--brand); background:var(--brand-soft)}
+  .opt.sel .kbd{border-color:var(--brand); color:var(--brand-deep)}
+
+  .nav{display:flex; gap:12px; margin-top:24px}
+  .nav .btn{width:auto; flex:1}
+
+  /* result — สีหลักของหน้านี้ผูกกับชมรมที่ได้ ผ่านตัวแปร --rc / --rcd / --rcs
+     (ถ้ายังไม่กำหนด จะ fallback เป็นสีแบรนด์หลัก) */
+  #result{--rc:var(--brand); --rcd:var(--brand-deep); --rcs:var(--brand-soft)}
+  .resulthero{text-align:center; margin-bottom:8px}
+  .emoji{
+    width:84px; height:84px; border-radius:50%; margin:0 auto 12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:48px; line-height:1; background:var(--rcs);
+    transition:background-color .4s var(--ease);
+  }
+  .rname{font-size:clamp(23px,5.6vw,29px); font-weight:700; margin-bottom:8px; color:var(--rcd); text-wrap:balance}
+  .rtag{display:inline-block; background:var(--rcs); color:var(--rcd);
+    padding:6px 14px; border-radius:999px; font-size:13px; font-weight:600; margin-bottom:16px}
+  .rdesc{color:var(--ink); font-size:16px; line-height:1.8; text-align:center; margin-bottom:22px; opacity:.92; text-wrap:pretty}
+
+  .panel{background:var(--bg); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-bottom:18px}
+  .panel h3{font-size:13px; color:var(--rcd); margin-bottom:10px; font-weight:600; letter-spacing:.2px}
+  .reasons ul{list-style:none; display:flex; flex-direction:column; gap:4px}
+  .reasons li{display:flex; gap:10px; align-items:flex-start; color:var(--ink); font-size:15px; opacity:.92}
+  .reasons li .b{color:var(--rc); flex-shrink:0}
+
+  /* booth CTA */
+  .booth{background:var(--rcs); border:1px solid color-mix(in srgb, var(--rc) 28%, #fff);
+    border-radius:18px; padding:20px; margin-bottom:18px; transition:background-color .4s var(--ease)}
+  .booth h3{font-size:13px; color:var(--rcd); font-weight:600; margin-bottom:8px; letter-spacing:.2px}
+  .booth .where{font-size:18px; font-weight:700; color:var(--ink); margin-bottom:4px; overflow-wrap:break-word}
+  .booth .when{font-size:14px; color:var(--muted); margin-bottom:14px; line-height:1.6}
+  .maplink{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    background:var(--rcd); color:#fff; text-decoration:none; font-weight:600; font-size:15px;
+    padding:13px 18px; border-radius:13px; transition:transform .18s var(--ease), opacity .18s var(--ease);
+  }
+  .maplink:hover{transform:translateY(-2px); opacity:.93}
+
+  .runners{margin:6px 0 20px}
+  .runners h3{font-size:13px; color:var(--muted); margin-bottom:10px; font-weight:600; text-align:center}
+  .chips{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+  .chip{background:var(--card); border:1.5px solid var(--line); border-radius:13px; padding:9px 13px;
+    font-size:14px; color:var(--ink); display:flex; align-items:center; gap:8px;
+    max-width:100%; overflow-wrap:break-word; word-break:break-word}
+  .chip .dotc{width:9px; height:9px; border-radius:50%; flex-shrink:0}
+  .chip .ico{line-height:1}
+
+  /* share */
+  .share{display:flex; gap:12px; margin-bottom:12px}
+  .sharebtn{
+    flex:1; display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    cursor:pointer; font-family:'Prompt'; font-weight:600; font-size:15px;
+    padding:13px 14px; border-radius:14px; border:2px solid var(--line); background:var(--card); color:var(--ink);
+    transition:border-color .15s var(--ease), background-color .15s var(--ease), transform .18s var(--ease);
+  }
+  .sharebtn:hover{border-color:var(--rc,var(--grape)); background:var(--rcs,var(--grape-soft)); transform:translateY(-2px)}
+  .sharebtn .ico{font-size:17px; line-height:1}
+
+  .footer-note{text-align:center; color:var(--muted); font-size:13px; margin-top:20px}
+  .hidden{display:none}
+
+  /* toast */
+  .toast{
+    position:fixed; left:50%; bottom:max(26px, calc(env(safe-area-inset-bottom) + 14px)); transform:translate(-50%,16px);
+    background:var(--ink); color:#fff; font-size:14px; font-weight:500;
+    padding:12px 20px; border-radius:999px; box-shadow:var(--shadow);
+    opacity:0; pointer-events:none; transition:opacity .25s var(--ease), transform .25s var(--ease);
+    z-index:var(--z-toast); max-width:88vw; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translate(-50%,0)}
+
+  /* motion */
+  .fade{animation:fade .45s var(--ease)}
+  @keyframes fade{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:translateY(0)}}
+  .opt{animation:optin .4s var(--ease) backwards}
+  @keyframes optin{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important}
+    .fill{transition:none}
+    .opt:hover{transform:none}
+    .btn:hover,.maplink:hover,.sharebtn:hover{transform:none}
+  }
+  @media(max-width:520px){
+    body{padding:16px}
+    .card{border-radius:22px}
+    .share{flex-direction:column}
+    .opt .kbd{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+
+    <!-- ===== INTRO ===== -->
+    <section id="intro" class="fade">
+      <span class="badge">🎉 เปิดโลกกิจกรรม</span>
+      <h1>ชมรมไหน<span class="hl">เหมาะกับคุณ?</span></h1>
+      <p class="sub mali">ตอบคำถามสั้น ๆ แค่ไม่กี่ข้อ แล้วเราจะช่วยหาชมรมที่ตรงจริตที่สุด — มาเริ่มกันเลย!</p>
+      <button class="btn" onclick="start()">เริ่มทำควิซ ✨</button>
+      <div class="meta">
+        <div><span class="dot"></span> ใช้เวลา ~1 นาที</div>
+        <div><span class="dot"></span> <span id="qn">7</span> คำถาม</div>
+        <div><span class="dot"></span> <span id="cn">8</span> ชมรม</div>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ ===== -->
+    <section id="quiz" class="hidden">
+      <div class="progresshead">
+        <span class="qcount" id="qcount">ข้อ 1</span>
+        <span class="qcount" id="qpct">0%</span>
+      </div>
+      <div class="bar" role="progressbar" aria-label="ความคืบหน้าของควิซ" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar">
+        <div class="fill" id="fill"></div>
+      </div>
+      <div class="qtext" id="qtext" aria-live="polite"></div>
+      <div class="opts" id="opts"></div>
+      <div class="nav">
+        <button class="btn ghost" id="backBtn" onclick="back()">← ย้อนกลับ</button>
+      </div>
+    </section>
+
+    <!-- ===== RESULT ===== -->
+    <section id="result" class="hidden">
+      <div id="shareCard">
+        <div class="resulthero">
+          <span class="emoji" id="rEmoji" aria-hidden="true">🎯</span>
+          <div class="rname" id="rName"></div>
+          <span class="rtag" id="rTag"></span>
+        </div>
+        <p class="rdesc" id="rDesc"></p>
+        <div class="panel reasons">
+          <h3>ทำไมถึงเหมาะกับคุณ</h3>
+          <ul id="rReasons"></ul>
+        </div>
+        <div class="booth">
+          <h3>เจอกันที่บูธ 👋</h3>
+          <div class="where" id="bWhere"></div>
+          <div class="when" id="bWhen"></div>
+          <a class="maplink" id="bMap" href="#" target="_blank" rel="noopener">🗺️ เปิดแผนที่งาน</a>
+        </div>
+      </div>
+      <div class="runners">
+        <h3>ชมรมอื่นที่น่าสนใจสำหรับคุณ</h3>
+        <div class="chips" id="rRunners"></div>
+      </div>
+      <div class="share">
+        <button class="sharebtn" onclick="shareResult()"><span class="ico" aria-hidden="true">🔗</span> แชร์ผลลัพธ์</button>
+        <button class="sharebtn" onclick="saveImage()"><span class="ico" aria-hidden="true">📸</span> บันทึกรูป</button>
+      </div>
+      <button class="btn solid-grape" onclick="restart()">ทำใหม่อีกครั้ง 🔄</button>
+      <p class="footer-note">อย่าลืมแวะบูธชมรมที่งานเปิดโลกกิจกรรมนะ 💜</p>
+    </section>
+
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =======================================================================
+   แก้ตรงนี้ได้เลย: ข้อมูลงาน (โชว์ในการ์ด "เจอกันที่บูธ")
+   ======================================================================= */
+const EVENT = {
+  place:"หอประชุมใหญ่ ชั้น 1",            // สถานที่จัดงาน
+  date:"ศุกร์ที่ 11 ก.ค.",                // วันจัดงาน
+  time:"10:00 – 16:00 น.",               // เวลา
+  mapUrl:"https://maps.google.com/"      // ลิงก์แผนที่งาน (เปลี่ยนเป็นลิงก์จริง)
+};
+
+/* =======================================================================
+   แก้ตรงนี้ได้เลย: รายชื่อชมรม (id ต้องไม่ซ้ำกัน)
+   booth = ตำแหน่งบูธของชมรมนั้นในงาน
+   ======================================================================= */
+const CLUBS = {
+  music:   {name:"ชมรมดนตรีสากล",       emoji:"🎸", tag:"สายสร้างสรรค์ + ชอบแสดงออก", booth:"โซน A · บูธ 03",
+            desc:"คุณมีพลังสร้างสรรค์และชอบอยู่กับเสียงเพลง ชมรมดนตรีจะให้คุณได้ฝึกเครื่องดนตรี รวมวง และขึ้นเวทีโชว์ของจริง"},
+  sports:  {name:"ชมรมกีฬา",            emoji:"⚽", tag:"สายแอคทีฟ + รักทีมเวิร์ก", booth:"โซน B · บูธ 11",
+            desc:"คุณชอบขยับร่างกายและบรรยากาศการแข่งขัน ชมรมกีฬาจะได้เพื่อนใหม่ ฝึกซ้อมเป็นทีม และลงแข่งจริงจัง"},
+  photo:   {name:"ชมรมถ่ายภาพ",          emoji:"📷", tag:"สายช่างสังเกต + ละเอียดอ่อน", booth:"โซน A · บูธ 07",
+            desc:"คุณมองเห็นความสวยในรายละเอียดที่คนอื่นมองข้าม ชมรมถ่ายภาพจะพาคุณออกไปเก็บภาพและเล่าเรื่องผ่านเลนส์"},
+  volunteer:{name:"ชมรมอาสาพัฒนา",      emoji:"🤝", tag:"สายใจดี + ชอบช่วยเหลือ", booth:"โซน C · บูธ 02",
+            desc:"คุณมีหัวใจอยากทำเพื่อคนอื่น ชมรมอาสาจะพาไปลงพื้นที่ ทำค่าย และสร้างความเปลี่ยนแปลงให้สังคมจริง ๆ"},
+  robotics:{name:"ชมรมหุ่นยนต์ & วิชาการ", emoji:"🤖", tag:"สายคิดวิเคราะห์ + ชอบความท้าทาย", booth:"โซน D · บูธ 05",
+            desc:"คุณสนุกกับการแก้โจทย์และลองอะไรใหม่ ๆ ชมรมนี้ได้สร้างหุ่นยนต์ เขียนโค้ด และลงแข่งขันระดับประเทศ"},
+  drama:   {name:"ชมรมศิลปะการแสดง",      emoji:"🎭", tag:"สายกล้าแสดงออก + ครีเอทีฟ", booth:"โซน A · บูธ 09",
+            desc:"คุณมีเสน่ห์บนเวทีและชอบเล่าเรื่อง ชมรมละครเวทีจะให้คุณได้แสดง กำกับ และสร้างโชว์ที่คนทั้งงานจดจำ"},
+  esports: {name:"ชมรมบอร์ดเกม & อีสปอร์ต", emoji:"🎮", tag:"สายวางแผน + ชอบเอาชนะ", booth:"โซน D · บูธ 12",
+            desc:"คุณคิดเป็นระบบและชอบกลยุทธ์ ชมรมนี้รวมคนคอเดียวกัน เล่นบอร์ดเกม จัดทัวร์นาเมนต์ และลุยอีสปอร์ตด้วยกัน"},
+  outdoor: {name:"ชมรมท่องเที่ยว & แคมป์ปิ้ง", emoji:"🏕️", tag:"สายผจญภัย + รักธรรมชาติ", booth:"โซน B · บูธ 08",
+            desc:"คุณชอบออกไปเจอโลกกว้าง ชมรมนี้พาเดินป่า ตั้งแคมป์ และเที่ยวผจญภัยกับเพื่อนใหม่ในทุกทริป"}
+};
+
+/* =======================================================================
+   สีประจำตัวของแต่ละชมรม — โชว์ในหน้าผลลัพธ์ (ชื่อ/แท็ก/อีโมจิ/บูธ/ชิป)
+   c = สีหลัก, d = สีเข้ม (ตัวอักษรบนพื้นขาว ผ่านคอนทราสต์), s = พื้นอ่อน
+   ======================================================================= */
+const CLUB_COLORS = {
+  music:    {c:"#e11d72", d:"#a3145a", s:"#fce7f0"},  // ชมพูสร้างสรรค์
+  sports:   {c:"#16a34a", d:"#15803d", s:"#dcfce7"},  // เขียวแอคทีฟ
+  photo:    {c:"#4f46e5", d:"#4338ca", s:"#e8e7fd"},  // ครามช่างสังเกต
+  volunteer:{c:"#0d9488", d:"#0f766e", s:"#d4f1ec"},  // เทียลใจดี
+  robotics: {c:"#2563eb", d:"#1d4ed8", s:"#dbeafe"},  // น้ำเงินเทค
+  drama:    {c:"#9333ea", d:"#7e22ce", s:"#f3e6fd"},  // ม่วงเวที
+  esports:  {c:"#ea580c", d:"#a83a08", s:"#fde8da"},  // ส้มแข่งขัน
+  outdoor:  {c:"#65a30d", d:"#446b0c", s:"#e6f4d3"}   // เขียวธรรมชาติ
+};
+
+/* =======================================================================
+   แก้ตรงนี้ได้เลย: คำถามและคะแนนของแต่ละตัวเลือก
+   scores = ให้คะแนนชมรมไหนบ้างเมื่อเลือกตัวเลือกนี้
+   ======================================================================= */
+const QUESTIONS = [
+  {
+    q:"ถ้าได้ไปเที่ยว 1 ทริป จะเลือกไปไหน?",
+    options:[
+      {ico:"🎪", t:"เทศกาลดนตรี / คอนเสิร์ตใหญ่",        scores:{music:3, drama:1}},
+      {ico:"🏔️", t:"เดินป่า ตั้งแคมป์ ดูดาว",            scores:{outdoor:3, photo:2}},
+      {ico:"🤝", t:"ทริปอาสาไปช่วยชุมชน",               scores:{volunteer:3}},
+      {ico:"🎮", t:"งาน Expo เทคโนโลยี / เกม",          scores:{robotics:2, esports:2}},
+      {ico:"🏄", t:"ทริปผจญภัย ลุยกิจกรรมหวาดเสียว",     scores:{sports:3, outdoor:1}}
+    ]
+  },
+  {
+    q:"ถ้าต้องเป็นสัตว์ 1 ชนิด จะเป็นอะไร?",
+    options:[
+      {ico:"🦜", t:"นกที่ร้องเพลงเพราะ / นกยูงอวดสีสัน", scores:{music:2, drama:2}},
+      {ico:"🦁", t:"สิงโต พลังเยอะ เป็นผู้นำ",           scores:{sports:3}},
+      {ico:"🐱", t:"แมว ช่างสังเกต เป็นตัวของตัวเอง",     scores:{photo:3}},
+      {ico:"🐶", t:"สุนัข ซื่อสัตย์ ใจดี",               scores:{volunteer:3}},
+      {ico:"🦉", t:"นกฮูก ฉลาด คิดเยอะ",                scores:{robotics:3}},
+      {ico:"🐺", t:"หมาป่า อยู่เป็นฝูง วางแผนเก่ง",       scores:{esports:3}},
+      {ico:"🦅", t:"เหยี่ยว รักอิสระ บินไกล",            scores:{outdoor:3}}
+    ]
+  },
+  {
+    q:"ถ้าเลือกแต่งตัวได้ จะแต่งแบบไหน?",
+    options:[
+      {ico:"🧥", t:"สตรีท / วินเทจ มีเอกลักษณ์",         scores:{music:3}},
+      {ico:"👟", t:"ชุดกีฬา คล่องตัว",                   scores:{sports:3}},
+      {ico:"🤎", t:"มินิมอล โทนเอิร์ธ เรียบเท่",         scores:{photo:3}},
+      {ico:"👕", t:"สบาย ๆ เข้าถึงง่าย ไม่ต้องเยอะ",      scores:{volunteer:3}},
+      {ico:"🤓", t:"เนิร์ดเท่ แว่น เสื้อลายเกม/วิทย์",    scores:{robotics:2, esports:2}},
+      {ico:"✨", t:"จัดเต็ม แฟชั่นจัด กล้าลองของใหม่",    scores:{drama:3}},
+      {ico:"🧣", t:"เสื้อกันหนาว รองเท้าเดินป่า",         scores:{outdoor:3}}
+    ]
+  },
+  {
+    q:"ของในกระเป๋าที่ขาดไม่ได้?",
+    options:[
+      {ico:"🎧", t:"หูฟัง / ปิ๊กกีตาร์",                 scores:{music:3}},
+      {ico:"💧", t:"ขวดน้ำ / ผ้าเช็ดเหงื่อ",             scores:{sports:3}},
+      {ico:"📷", t:"กล้องหรือมือถือไว้ถ่ายรูป",          scores:{photo:3}},
+      {ico:"📓", t:"สมุดจดไอเดียอยากทำเพื่อคนอื่น",       scores:{volunteer:3}},
+      {ico:"🔌", t:"สายชาร์จ / gadget สารพัด",          scores:{robotics:3}},
+      {ico:"🃏", t:"การ์ดเกม / มือถือเล่นเกม",           scores:{esports:3}},
+      {ico:"🗺️", t:"แผนที่ / พาวเวอร์แบงค์ไว้ลุย",       scores:{outdoor:3}}
+    ]
+  },
+  {
+    q:"คืนวันศุกร์ อยากดูหนังแนวไหน?",
+    options:[
+      {ico:"🎵", t:"หนังเพลง / มิวสิคัล",                scores:{music:2, drama:2}},
+      {ico:"🥊", t:"หนังกีฬา สู้เพื่อแชมป์",             scores:{sports:3}},
+      {ico:"🌿", t:"สารคดีธรรมชาติสวย ๆ",               scores:{photo:2, outdoor:2}},
+      {ico:"❤️", t:"หนังที่ทำให้อยากเปลี่ยนโลก",         scores:{volunteer:3}},
+      {ico:"🚀", t:"Sci-fi หุ่นยนต์ อนาคต",             scores:{robotics:3}},
+      {ico:"🎲", t:"หนังวางแผนปล้น / เกมไหวพริบ",        scores:{esports:3}}
+    ]
+  },
+  {
+    q:"ถ้าได้ซูเปอร์พาวเวอร์ 1 อย่าง?",
+    options:[
+      {ico:"🎙️", t:"สะกดใจคนด้วยเสียง",                scores:{drama:3, music:1}},
+      {ico:"💪", t:"พลังกายเหนือมนุษย์",                scores:{sports:3}},
+      {ico:"⏸️", t:"หยุดเวลาเก็บภาพช่วงเวลาสวย",        scores:{photo:3}},
+      {ico:"🩹", t:"รักษาและช่วยเหลือคนได้",            scores:{volunteer:3}},
+      {ico:"🛠️", t:"เสกอะไรก็ได้ด้วยความคิด",          scores:{robotics:3}},
+      {ico:"♟️", t:"มองเกมออกล่วงหน้า",                scores:{esports:3}},
+      {ico:"🕊️", t:"บินไปไหนก็ได้ทั่วโลก",             scores:{outdoor:3}}
+    ]
+  },
+  {
+    q:"คำชมที่อยากได้ยินที่สุด?",
+    options:[
+      {ico:"😄", t:"\"อยู่ด้วยแล้วสนุก บรรยากาศดีขึ้น\"", scores:{drama:3, music:1}},
+      {ico:"🔥", t:"\"เก่งและไม่เคยยอมแพ้\"",            scores:{sports:3}},
+      {ico:"🌸", t:"\"มองโลกสวยจังเลย\"",               scores:{photo:3}},
+      {ico:"💗", t:"\"เป็นคนใจดีที่สุด\"",               scores:{volunteer:3}},
+      {ico:"🧠", t:"\"ฉลาดมาก คิดได้ไง\"",              scores:{robotics:3}},
+      {ico:"🎯", t:"\"คิดเกมขาดสุด ๆ\"",                scores:{esports:3}},
+      {ico:"🧭", t:"\"ลุยไม่กลัวอะไรเลย\"",             scores:{outdoor:3}}
+    ]
+  }
+];
+
+/* ===================== ระบบหลัง ไม่ต้องแก้ ===================== */
+let current=0, answers=[], lastWin=null, busy=false;
+
+document.getElementById('qn').textContent = QUESTIONS.length;
+document.getElementById('cn').textContent = Object.keys(CLUBS).length;
+
+function show(id){
+  ['intro','quiz','result'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  const el=document.getElementById(id);
+  el.classList.remove('hidden','fade'); void el.offsetWidth; el.classList.add('fade');
+}
+function start(){ current=0; answers=[]; show('quiz'); render(); }
+
+function render(){
+  busy=false;                       // ปลดล็อกเมื่อแสดงข้อใหม่
+  const Q=QUESTIONS[current];
+  document.getElementById('qcount').textContent='ข้อ '+(current+1)+' / '+QUESTIONS.length;
+  const pct=Math.round(current/QUESTIONS.length*100);
+  document.getElementById('qpct').textContent=pct+'%';
+  document.getElementById('fill').style.transform='scaleX('+(pct/100)+')';
+  document.getElementById('bar').setAttribute('aria-valuenow', pct);
+  document.getElementById('qtext').textContent=Q.q;
+  const box=document.getElementById('opts'); box.innerHTML='';
+  Q.options.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'+(answers[current]===i?' sel':'');
+    b.style.animationDelay=(i*45)+'ms';
+    b.setAttribute('aria-label', o.t);
+    b.innerHTML='<span class="ico" aria-hidden="true">'+o.ico+'</span>'+
+                '<span class="t">'+o.t+'</span>'+
+                '<span class="kbd" aria-hidden="true">'+(i+1)+'</span>';
+    b.onclick=()=>choose(i);
+    box.appendChild(b);
+  });
+  document.getElementById('backBtn').style.visibility = current===0?'hidden':'visible';
+}
+/* เลือกคำตอบ + กันแตะรัว/ดับเบิลแทปข้ามข้อ */
+function choose(i){
+  if(busy) return;
+  busy=true;
+  answers[current]=i;
+  next();
+  setTimeout(()=>{ busy=false; }, 300);   // เผื่อกรณีหน้าสุดท้าย (render ไม่ได้ถูกเรียก)
+}
+function next(){
+  if(current<QUESTIONS.length-1){ current++; render(); }
+  else {
+    document.getElementById('fill').style.transform='scaleX(1)';
+    document.getElementById('bar').setAttribute('aria-valuenow', 100);
+    document.getElementById('qpct').textContent='100%';
+    setTimeout(finish,260);
+  }
+}
+function back(){ if(current>0){ current--; render(); } }
+
+/* keyboard: 1-9 เลือกตัวเลือก, ← ย้อนกลับ */
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('quiz').classList.contains('hidden')) return;
+  if(e.key>='1' && e.key<='9'){
+    const i=+e.key-1, Q=QUESTIONS[current];
+    if(i<Q.options.length){ choose(i); }
+  } else if(e.key==='ArrowLeft'){ back(); }
+});
+
+function finish(){
+  const score={}; Object.keys(CLUBS).forEach(k=>score[k]=0);
+  answers.forEach((ans,qi)=>{
+    const s=QUESTIONS[qi].options[ans].scores;
+    for(const k in s) score[k]+=s[k];
+  });
+  const ranked=Object.keys(CLUBS).sort((a,b)=>score[b]-score[a]);
+  const winKey=ranked[0], win=CLUBS[winKey]; lastWin=win;
+
+  // ทาสีหน้าผลลัพธ์ตามชมรมที่ได้
+  const col=CLUB_COLORS[winKey];
+  if(col){ const R=document.getElementById('result');
+    R.style.setProperty('--rc',col.c); R.style.setProperty('--rcd',col.d); R.style.setProperty('--rcs',col.s); }
+
+  document.getElementById('rEmoji').textContent=win.emoji;
+  document.getElementById('rName').textContent=win.name;
+  document.getElementById('rTag').textContent=win.tag;
+  document.getElementById('rDesc').textContent=win.desc;
+
+  // เหตุผล: ดึงจากตัวเลือกที่ผู้เล่นเลือกแล้วให้คะแนนชมรมที่ชนะ
+  const reasons=[];
+  answers.forEach((ans,qi)=>{
+    const o=QUESTIONS[qi].options[ans];
+    if(o.scores[winKey]) reasons.push(o.t);
+  });
+  const rl=document.getElementById('rReasons'); rl.innerHTML='';
+  (reasons.length?reasons.slice(0,3):['คำตอบของคุณเข้ากับสไตล์ชมรมนี้มากที่สุด'])
+    .forEach(r=>{const li=document.createElement('li');
+      li.innerHTML='<span class="b" aria-hidden="true">✦</span><span>'+r+'</span>'; rl.appendChild(li);});
+
+  // บูธ
+  document.getElementById('bWhere').textContent=win.name+' — '+win.booth;
+  document.getElementById('bWhen').textContent=EVENT.place+' · '+EVENT.date+' · '+EVENT.time;
+  document.getElementById('bMap').href=EVENT.mapUrl;
+
+  const rr=document.getElementById('rRunners'); rr.innerHTML='';
+  ranked.slice(1,4).forEach(k=>{
+    const c=CLUBS[k], cc=CLUB_COLORS[k]; const sp=document.createElement('span');
+    sp.className='chip';
+    if(cc){ sp.style.background=cc.s; sp.style.borderColor='color-mix(in srgb,'+cc.c+' 42%, #fff)'; }
+    sp.innerHTML=(cc?'<span class="dotc" style="background:'+cc.c+'" aria-hidden="true"></span>':'')+
+      '<span class="ico" aria-hidden="true">'+c.emoji+'</span><span>'+c.name+'</span>';
+    rr.appendChild(sp);
+  });
+  show('result');
+}
+function restart(){ show('intro'); }
+
+/* ===================== แชร์ผลลัพธ์ ===================== */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2400);
+}
+/* คัดลอกข้อความ: ใช้ Clipboard API ถ้าได้ ไม่งั้น fallback เป็น execCommand
+   (จำเป็นเมื่อเปิดไฟล์แบบ file:// หรือ http ที่ Clipboard API ใช้ไม่ได้) */
+function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise((res,rej)=>{
+    try{
+      const ta=document.createElement('textarea');
+      ta.value=text; ta.setAttribute('readonly','');
+      ta.style.position='fixed'; ta.style.top='-9999px';
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0, text.length);
+      const ok=document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? res() : rej(new Error('execCommand copy failed'));
+    }catch(err){ rej(err); }
+  });
+}
+async function shareResult(){
+  const name=lastWin?lastWin.name:'ชมรมที่ใช่';
+  const text='ฉันได้ "'+name+'" จากควิซ ชมรมไหนเหมาะกับคุณ! 🎉 มาลองกันดู';
+  const url=location.href;
+  if(navigator.share){
+    try{ await navigator.share({title:'ชมรมไหนเหมาะกับคุณ?', text, url}); }
+    catch(e){ /* ผู้ใช้ยกเลิก - ไม่ต้องทำอะไร */ }
+  } else {
+    try{ await copyText(text+' '+url); toast('คัดลอกลิงก์แล้ว ✓ เอาไปแชร์ได้เลย'); }
+    catch(e){ toast('คัดลอกอัตโนมัติไม่ได้ — แคปหน้าจอแชร์ได้เลย 📸'); }
+  }
+}
+function saveImage(){
+  const node=document.getElementById('shareCard');
+  if(typeof html2canvas!=='function'){ toast('กำลังโหลด ลองอีกครั้งใน 1 วิ'); return; }
+  toast('กำลังสร้างรูป...');
+  html2canvas(node,{backgroundColor:'#ffffff', scale:2, useCORS:true}).then(canvas=>{
+    const a=document.createElement('a');
+    a.download='club-result-'+(lastWin?lastWin.name:'result')+'.png';
+    a.href=canvas.toDataURL('image/png'); a.click();
+    toast('บันทึกรูปแล้ว 📸 เอาไปลง story ได้เลย');
+  }).catch(()=>toast('บันทึกไม่สำเร็จ ลองแคปหน้าจอแทนได้นะ'));
+}
+</script>
+</body>
+</html>
